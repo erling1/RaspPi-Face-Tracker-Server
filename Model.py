@@ -54,10 +54,6 @@ class FaceDetector():
 
     def facial_recognition_tracker(self, camera_feed: Iterator[np.NDArray]):
 
-        """url = "http://192.168.1.172:8000/camera"
-        
-        response = requests.get(url, stream=True)"""
-
         haar_cascade = self.face_detector
         recognizer = self.recognizer
         recognizer.read('trainer/trainer.yml')
@@ -69,30 +65,22 @@ class FaceDetector():
             numpy_array = np.frombuffer(frame, dtype=np.uint8)
             # Decode JPEG bytes to OpenCV image
             cv2_frame = cv2.imdecode(numpy_array, cv2.IMREAD_COLOR)
+
             if cv2_frame is not None:
                 cv2.imshow('Video Stream', cv2_frame)  #Remove this       Display the current frame 
 
                 gray_img = cv2.cvtColor(cv2_frame, cv2.COLOR_BGR2GRAY) 
                 faces_rect = haar_cascade.detectMultiScale(gray_img, scaleFactor=1.1, minNeighbors=9)
 
+                rects = []
                 # Iterating through rectangles of detected faces 
-                for (x, y, w, h) in faces_rect: 
+                for (x, y, w, h) in faces_rect:
+                    rects.append((x,y,w,h)) 
                     cv2.rectangle(cv2_frame, (x, y), (x+w, y+h), (0, 255, 0), 2) 
 
 
-
-                yield cv2_frame
+                yield (cv2_frame, rects)
                 
-                """cv2.imshow('Detected faces', cv2_frame) 
-
-                
-                
-                # Break the loop if 'q' is pressed
-                if cv2.waitKey(1) & 0xFF == ord('q'):
-                    break
-
-        # Cleanup resources
-        cv2.destroyAllWindows()"""
 
 
 detector = FaceDetector
